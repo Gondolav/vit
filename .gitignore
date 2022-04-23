@@ -1,0 +1,5 @@
+.vit
+.vscode
+env
+*.txt
+**__pycache__**
