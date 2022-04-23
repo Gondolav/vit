@@ -9,13 +9,22 @@ from vit.commands.config import (
     VIT_MAIN_FOLDER,
     VIT_STAGING_FOLDER,
 )
-from vit.commands.helpers import get_ignored_files, merged_commits
+from vit.commands.helpers import (
+    am_i_in_the_past,
+    get_current_commit_id,
+    get_ignored_files,
+    get_last_commit_id,
+    merged_commits,
+)
 
 
 @dataclass
 class Status:
     branch: str
-    unstaged_files: List[str]
+    current_commit_id: str
+    last_commit_id: str
+    in_the_past: bool
+    untracked_files: List[str]
     staged_files: List[str]
     modified_files: List[str]
 
@@ -25,7 +34,7 @@ def get_status():
     all_files = os.listdir(os.getcwd())
     ignored_files = get_ignored_files()
 
-    unstaged_files = list(set(all_files) - set(staged_files) - set(ignored_files))
+    untracked_files = list(set(all_files) - set(staged_files) - set(ignored_files))
 
     # Collect tracked files
     tracked_files = []
@@ -54,16 +63,22 @@ def get_status():
         modified_files = list(set(modified_files) - set(staged_files))
 
         # Remove .vit/
-        unstaged_files.remove(VIT_MAIN_FOLDER)
+        untracked_files.remove(VIT_MAIN_FOLDER)
 
-        # Remove tracked and modified files from the unstaged ones
-        unstaged_files = list(
-            set(unstaged_files) - set(tracked_files) - set(modified_files)
+        # Remove tracked and modified files from the untracked ones
+        untracked_files = list(
+            set(untracked_files) - set(tracked_files) - set(modified_files)
         )
+
+        current_commit_id = get_current_commit_id()
+        last_commit_id = get_last_commit_id()
 
         return Status(
             branch="main",
-            unstaged_files=unstaged_files,
+            current_commit_id=get_current_commit_id(),
+            last_commit_id=get_last_commit_id(),
+            in_the_past=am_i_in_the_past(current_commit_id, last_commit_id),
+            untracked_files=untracked_files,
             staged_files=staged_files,
             modified_files=modified_files,
         )

@@ -9,6 +9,7 @@ from vit.commands.status import get_status
 from vit.commands.history import get_history
 from vit.commands.diff import get_diff
 from vit.commands.reset import reset_files
+from vit.commands.travel import travel_to
 
 app = typer.Typer()
 
@@ -39,7 +40,11 @@ def commit(msg: str):
 
 @app.command()
 def history():
-    typer.echo(get_history())
+    history_str = get_history()
+    if history_str:
+        typer.echo(history_str)
+    else:
+        typer.echo("No commits")
 
 
 @app.command()
@@ -58,11 +63,25 @@ def reset(files: List[str]):
 
 
 @app.command()
+def travel(commit_id: str):
+    travel_to(commit_id)
+
+
+@app.command()
 def status():
     status = get_status()
+    current_commit_id = status.current_commit_id
+    last_commit_id = status.last_commit_id
+
     files_to_be_committed = "\n  ".join(status.staged_files)
-    unstaged_files = "\n  ".join(status.unstaged_files)
+    untracked_files = "\n  ".join(status.untracked_files)
     modified_files = "\n  ".join(status.modified_files)
+
+    commit_id_message = (
+        f"\nYou're in the past (at commit {current_commit_id})\nChanges are compared to the last commit {last_commit_id}"
+        if status.in_the_past
+        else f"\nLast commit is {last_commit_id}"
+    )
 
     modified_files_message = (
         typer.style(
@@ -86,20 +105,20 @@ def status():
         else ""
     )
 
-    unstaged_files_message = (
+    untracked_files_message = (
         typer.style(
             f"""
-\nUnstaged files:
-  {unstaged_files}""",
+\nUntracked files:
+  {untracked_files}""",
             fg=typer.colors.CYAN,
         ).strip()
-        if unstaged_files
+        if untracked_files
         else ""
     )
 
     typer.echo(
         f"""
-On branch {status.branch}{files_to_be_committed_message}{modified_files_message}{unstaged_files_message}
+On branch {status.branch}\n{commit_id_message}{files_to_be_committed_message}{modified_files_message}{untracked_files_message}
 """.strip()
     )
 
