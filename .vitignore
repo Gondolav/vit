@@ -1,0 +1,6 @@
+vit
+env
+.vscode
+.DS_Store
+.git
+.gitignore

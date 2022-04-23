@@ -9,7 +9,7 @@ from vit.commands.config import (
     VIT_MAIN_FOLDER,
     VIT_STAGING_FOLDER,
 )
-from vit.commands.helpers import merged_commits
+from vit.commands.helpers import get_ignored_files, merged_commits
 
 
 @dataclass
@@ -23,8 +23,9 @@ class Status:
 def get_status():
     staged_files = os.listdir(VIT_STAGING_FOLDER)
     all_files = os.listdir(os.getcwd())
+    ignored_files = get_ignored_files()
 
-    unstaged_files = list(set(all_files) - set(staged_files))
+    unstaged_files = list(set(all_files) - set(staged_files) - set(ignored_files))
 
     # Collect tracked files
     tracked_files = []

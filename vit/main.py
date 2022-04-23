@@ -64,35 +64,44 @@ def status():
     unstaged_files = "\n  ".join(status.unstaged_files)
     modified_files = "\n  ".join(status.modified_files)
 
-    if files_to_be_committed:
-        typer.echo(
+    modified_files_message = (
+        typer.style(
             f"""
-On branch {status.branch}
+\nModified files:
+  {modified_files}""",
+            fg=typer.colors.RED,
+        ).strip()
+        if modified_files
+        else ""
+    )
 
-Files to be committed:
-  {files_to_be_committed}
-
-Modified files:
-  {modified_files}
-
-Unstaged files:
-  {unstaged_files}
-""".strip()
-        )
-    else:
-        typer.echo(
+    files_to_be_committed_message = (
+        typer.style(
             f"""
-On branch {status.branch}
+\nFiles to be committed:
+  {files_to_be_committed}""",
+            fg=typer.colors.GREEN,
+        ).strip()
+        if files_to_be_committed
+        else ""
+    )
 
-Nothing to be committed
+    unstaged_files_message = (
+        typer.style(
+            f"""
+\nUnstaged files:
+  {unstaged_files}""",
+            fg=typer.colors.CYAN,
+        ).strip()
+        if unstaged_files
+        else ""
+    )
 
-Modified files:
-  {modified_files}
-
-Unstaged files:
-  {unstaged_files}
+    typer.echo(
+        f"""
+On branch {status.branch}{files_to_be_committed_message}{modified_files_message}{unstaged_files_message}
 """.strip()
-        )
+    )
 
 
 if __name__ == "__main__":

@@ -1,9 +1,27 @@
 import os
 import shutil
+from typing import List
 import sysrsync
 from contextlib import contextmanager
 
-from vit.commands.config import HISTORY_FILE, TEMP_FOLDER, VIT_COMMITS_FOLDER
+from vit.commands.config import (
+    HISTORY_FILE,
+    TEMP_FOLDER,
+    VIT_COMMITS_FOLDER,
+    VITIGNORE_FILE_NAME,
+)
+
+
+def get_ignored_files() -> List[str]:
+    if os.path.exists(VITIGNORE_FILE_NAME):
+        with open(VITIGNORE_FILE_NAME, "r") as vitignore_file:
+            return list(
+                filter(
+                    lambda l: l, map(lambda l: l.strip(), vitignore_file.readlines())
+                )
+            )
+    else:
+        return []
 
 
 @contextmanager

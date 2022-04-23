@@ -24,7 +24,7 @@ def commit_files(msg: str):
         tracked_files_file.write("\n".join(new_to_track_files) + "\n")
 
     with open(HISTORY_FILE, "a") as history_file:
-        history_file.write(f"{datetime.now()} - {commit_name} - {msg}\n")
+        history_file.write(f"{datetime.now()} - commit {commit_name} - {msg}\n")
 
     shutil.rmtree(VIT_STAGING_FOLDER)
     os.mkdir(VIT_STAGING_FOLDER)
